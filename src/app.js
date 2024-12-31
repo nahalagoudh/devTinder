@@ -3,10 +3,15 @@ const connectDB = require('./config/database');
 const User = require("./models/user");
 const { ValidateSignupdata } = require('./utils/Validation')
 const bcrypt = require('bcrypt');
+const cookieParser = require("cookie-parser")
+const jwt = require('jsonwebtoken')
+const { auth } = require("./middleware/auth")
+
 
 const app = express();
 
 app.use(express.json())
+app.use(cookieParser())
 
 
 // app.post("/signup", async (req, res) => {
@@ -46,7 +51,10 @@ app.post("/login", async (req, res) => {
             throw new Error("Invalid Email")
         }
         const isVliadpassword = await bcrypt.compare(password, user.password)
+        const token = await jwt.sign({ _id: user._id }, "secretcode123@")
+        console.log(token)
         if (isVliadpassword) {
+            res.cookie("token", token)
             res.send("Login successfully")
         } else {
             throw new Error("Paswrd is not correct")
@@ -57,6 +65,24 @@ app.post("/login", async (req, res) => {
         // res.status(404).send("Error occured", error.message)
     }
 })
+app.get("/profile", auth, async (req, res) => {
+    // const cookie = req.cookies;
+    // console.log("cookie", cookie)
+
+    // const { token } = cookie;
+    // const decodedVal = await jwt.verify(token, "secretcode123@")
+    // console.log("decodedVal", decodedVal)
+    // const { _id } = decodedVal
+    const user = await User.findById(_id)
+    res.send(user)
+    if (token) {
+
+    }
+
+
+})
+
+
 app.get("/user", async (req, res) => {
     // const user = new User(req.body)
     try {

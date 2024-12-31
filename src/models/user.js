@@ -83,6 +83,8 @@ const UserSchema = new mongoose.Schema({
     }
 })
 
+// const UserSchema.methods.
+
 
 const User = mongoose.model("People", UserSchema)
 
