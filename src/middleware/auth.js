@@ -8,13 +8,16 @@ const auth = async (req, res, next) => {
         if (!token) {
             throw new Error("Invalid token")
         }
-        const decodedVal = await jwt.verify(token, "secretcode123@")
-        // console.log("decodedVal", decodedVal)
-        // const { _id } = decodedVal
+        const decodedVal = await jwt.verify(token, "secretcode123@", { expiresIn: "1d" })
+        console.log("decodedVal", decodedVal)
+        const { _id, iat } = decodedVal;
         const user = await User.findById(_id)
+        console.log("user--->", user)
+
         if (!user) {
             throw new Error("User doesnt exist")
         }
+        req.user = user;
         next()
 
     } catch (error) {

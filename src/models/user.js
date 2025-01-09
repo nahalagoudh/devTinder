@@ -1,34 +1,7 @@
-// const mongoose = require("mongoose");
-
-
-// const userSchema = new mongoose.Schema({
-//     firstName: {
-//         type: String
-//     },
-//     lasttName: {
-//         type: String
-//     },
-//     emailId: {
-//         type: String
-//     },
-//     password: {
-//         type: String
-//     },
-//     age: {
-//         type: Number
-//     },
-//     gender: {
-//         type: String
-//     }
-
-// })
-
-// const userModel = mongoose.model("User", userSchema)
-// module.exports = userModel;
-
-
 const mongoose = require("mongoose");
 var validator = require('validator');
+const jwt = require('jsonwebtoken')
+
 
 const UserSchema = new mongoose.Schema({
     firstName: {
@@ -79,15 +52,23 @@ const UserSchema = new mongoose.Schema({
     },
     skills: {
         type: [String]
-
     }
 })
 
-// const UserSchema.methods.
+UserSchema.methods.getJWT = async function () {
+    const user = this;
+    const token = await jwt.sign({ _id: user._id }, "secretcode123@")
+    return token;
+}
+
+UserSchema.methods.validatePassword = async function (passwordByInput) {
+    const user = this;
+    // Nahala@444
+    const isValidPassword = await bcrypt.compare(user.password, passwordByInput)
+    return isValidPassword;
+}
 
 
 const User = mongoose.model("People", UserSchema)
-
-// const People = mongoose.model("People", UserSchema);
 
 module.exports = User;

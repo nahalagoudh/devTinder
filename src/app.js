@@ -1,10 +1,8 @@
 const express = require("express");
 const connectDB = require('./config/database');
-const User = require("./models/user");
-const { ValidateSignupdata } = require('./utils/Validation')
+
 const bcrypt = require('bcrypt');
 const cookieParser = require("cookie-parser")
-const jwt = require('jsonwebtoken')
 const { auth } = require("./middleware/auth")
 
 
@@ -14,77 +12,9 @@ app.use(express.json())
 app.use(cookieParser())
 
 
-// app.post("/signup", async (req, res) => {
-//     const user = new userModel({
-//         firstName: "nahala",
-//         lasttName: "g",
-//         emailId: "ngm@gmail.com",
-//         gender: "male"
-//     })
-//     await user.save()
-//     res.send("User added successfully!")
-// })
-
-
-app.post("/signup", async (req, res) => {
-    try {
-        const { firstName, lastName, emailId, password } = req.body;
-
-        const passwordHash = await bcrypt.hash(password, 10);
-
-        const user = new User({ firstName, lastName, emailId, password: passwordHash })
-        ValidateSignupdata(req)
-        await user.save();
-        res.send("User added successfully!")
-    } catch (error) {
-        res.status(400).send(error.message)
-        // res.status(404).send("Error occured", error.message)
-    }
-
-})
-app.post("/login", async (req, res) => {
-    try {
-        const { emailId, password } = req.body;
-
-        const user = await User.findOne({ emailId: emailId })
-        if (!user) {
-            throw new Error("Invalid Email")
-        }
-        const isVliadpassword = await bcrypt.compare(password, user.password)
-        const token = await jwt.sign({ _id: user._id }, "secretcode123@")
-        console.log(token)
-        if (isVliadpassword) {
-            res.cookie("token", token)
-            res.send("Login successfully")
-        } else {
-            throw new Error("Paswrd is not correct")
-        }
-
-    } catch (error) {
-        res.status(400).send(error.message)
-        // res.status(404).send("Error occured", error.message)
-    }
-})
-app.get("/profile", auth, async (req, res) => {
-    // const cookie = req.cookies;
-    // console.log("cookie", cookie)
-
-    // const { token } = cookie;
-    // const decodedVal = await jwt.verify(token, "secretcode123@")
-    // console.log("decodedVal", decodedVal)
-    // const { _id } = decodedVal
-    const user = await User.findById(_id)
-    res.send(user)
-    if (token) {
-
-    }
-
-
-})
-
-
 app.get("/user", async (req, res) => {
-    // const user = new User(req.body)
+    const user = new User(req.body)
+    console.log(URLSearchParams)
     try {
         const user = await User.findOne({ _id: req.body._id })
         if (user.length === 0) {
@@ -96,8 +26,6 @@ app.get("/user", async (req, res) => {
     } catch {
 
     }
-
-
 })
 
 app.get("/feed", async (req, res) => {
@@ -162,3 +90,17 @@ connectDB().then(() => {
 }).catch((err) => {
     console.log("database connection error!!!")
 })
+
+
+
+
+// app.post("/signup", async (req, res) => {
+//     const user = new userModel({
+//         firstName: "nahala",
+//         lasttName: "g",
+//         emailId: "ngm@gmail.com",
+//         gender: "male"
+//     })
+//     await user.save()
+//     res.send("User added successfully!")
+// })
